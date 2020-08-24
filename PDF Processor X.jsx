@@ -1,4 +1,4 @@
-﻿/*
+/*
 	PDF Processor X
 	August 2020, Paul Chiorean
 
@@ -294,7 +294,7 @@ function main() {
 	win.gOkCancel = win.add("group", undefined);
 	win.gOkCancel.orientation = "column";
 	win.gOkCancel.alignChildren = "fill";
-	win.gOkCancel.bu1 = win.gOkCancel.add("button", undefined, "Process", {name: "ok"});
+	win.gOkCancel.bu1 = win.gOkCancel.add("button", undefined, "Ok", {name: "ok"});
 	win.gOkCancel.bu2 = win.gOkCancel.add("button", undefined, "Cancel", {name: "cancel"});
 
 	// Process all PDFs

@@ -1,6 +1,6 @@
 /*
 	PDF Processor X
-	August 2020, Paul Chiorean
+	September 2020, Paul Chiorean
 
 	A modified version of 'PDF Processor for CS3 II' by Paul MR, Wed Aug 08, 2012
 	https://web.archive.org/web/20150511194417/https://www.ps-scripts.com/bb/viewtopic.php?f=10&t=1882&sid=a87e6a1cbc6fec5b38abbfc402e624ac
@@ -30,295 +30,283 @@ function main() {
 	win.gMode = win.main.add("panel", undefined, "Mode & cropping");
 	win.gMode.orientation = "column";
 	win.gMode.alignChildren = "left";
-
-	win.gMode.g1 = win.gMode.add("group", undefined);
-	win.gMode.g1.orientation = "row";
-	win.gMode.g1.st1 = win.gMode.g1.add("statictext", undefined, "Color mode:");
-	win.gMode.g1.st1.preferredSize.width = 90;
-	win.gMode.g1.dd1 = win.gMode.g1.add("dropdownlist", undefined, undefined, 
-		{items: ['CMYK Color', 'RGB Color', 'Grayscale', 'Lab Color']});
-	win.gMode.g1.dd1.selection = 0;
-	win.gMode.g1.st2 = win.gMode.g1.add("statictext", undefined, "Bit depth:");
-	win.gMode.g1.dd2 = win.gMode.g1.add("dropdownlist", undefined, undefined, {items: [8, 16]});
-	win.gMode.g1.dd2.selection = 0;
-	win.gMode.g1.st3 = win.gMode.g1.add("statictext", undefined, "Resolution:");
-	win.gMode.g1.et1 = win.gMode.g1.add('edittext {properties: {name: "et1"}}');
-	win.gMode.g1.et1.preferredSize.width = 40;
-	win.gMode.g1.et1.text = "300";
-	win.gMode.g1.et1.onChanging = function() {
-		if (this.text.match(/[^\-\.\d]/)) this.text = this.text.replace(/[^\-\.\d]/g, '');
-	}
-
-	win.gMode.g2 = win.gMode.add("group", undefined);
-	win.gMode.g2.orientation = "row";
-	win.gMode.g2.st1 = win.gMode.g2.add("statictext", undefined, "Crop to:");
-	win.gMode.g2.st1.preferredSize.width = 90;
-	win.gMode.g2.dd1 = win.gMode.g2.add("dropdownlist", undefined, undefined, 
-		{items: ['Bounding Box', 'Media Box', 'Crop Box', 'Bleed Box', 'Trim Box', 'Art Box']});
-	win.gMode.g2.dd1.selection = 1;
-	win.gMode.g2.cb1 = win.gMode.g2.add("checkbox", undefined, "Flatten document");
-	win.gMode.g2.cb1.value = true;
-
+		win.gMode.g1 = win.gMode.add("group", undefined);
+		win.gMode.g1.orientation = "row";
+			win.gMode.g1.st1 = win.gMode.g1.add("statictext", undefined, "Color mode:");
+			win.gMode.g1.st1.preferredSize.width = 90;
+			win.gMode.g1.dd1 = win.gMode.g1.add("dropdownlist", undefined, undefined, 
+				{items: ['CMYK Color', 'RGB Color', 'Grayscale', 'Lab Color']});
+			win.gMode.g1.dd1.selection = 0;
+			win.gMode.g1.st2 = win.gMode.g1.add("statictext", undefined, "Bit depth:");
+			win.gMode.g1.dd2 = win.gMode.g1.add("dropdownlist", undefined, undefined, {items: [8, 16]});
+			win.gMode.g1.dd2.selection = 0;
+			win.gMode.g1.st3 = win.gMode.g1.add("statictext", undefined, "Resolution:");
+			win.gMode.g1.et1 = win.gMode.g1.add('edittext {properties: {name: "et1"}}');
+			win.gMode.g1.et1.preferredSize.width = 40;
+			win.gMode.g1.et1.text = "300";
+			win.gMode.g1.et1.onChanging = function() {
+				if (this.text.match(/[^\-\.\d]/)) this.text = this.text.replace(/[^\-\.\d]/g, '');
+			}
+		win.gMode.g2 = win.gMode.add("group", undefined);
+		win.gMode.g2.orientation = "row";
+			win.gMode.g2.st1 = win.gMode.g2.add("statictext", undefined, "Crop to:");
+			win.gMode.g2.st1.preferredSize.width = 90;
+			win.gMode.g2.dd1 = win.gMode.g2.add("dropdownlist", undefined, undefined, 
+				{items: ['Bounding Box', 'Media Box', 'Crop Box', 'Bleed Box', 'Trim Box', 'Art Box']});
+			win.gMode.g2.dd1.selection = 1;
+			win.gMode.g2.cb1 = win.gMode.g2.add("checkbox", undefined, "Flatten document");
+			win.gMode.g2.cb1.value = true;
 	// Panel 2: Range
 	win.gPages = win.main.add("panel", undefined, "Pages to process");
 	win.gPages.orientation = "row";
 	win.gPages.alignChildren = "left";
-	win.gPages.rb1 = win.gPages.add("radiobutton", undefined, "First page only");
-	win.gPages.rb2 = win.gPages.add("radiobutton", undefined, "All pages");
-	win.gPages.rb3 = win.gPages.add("radiobutton", undefined, "Range");
-	win.gPages.rb2.value = true;
-	win.gPages.st1 = win.gPages.add("statictext", undefined, "From:");
-	win.gPages.et1 = win.gPages.add('edittext {properties: {name: "et1"}}');
-	win.gPages.et1.preferredSize.width = 40;
-	win.gPages.st2 = win.gPages.add("statictext", undefined, "To:");
-	win.gPages.et2 = win.gPages.add('edittext {properties: {name: "et2"}}');
-	win.gPages.et2.preferredSize.width = 40;
-	win.gPages.rb1.onClick = win.gPages.rb2.onClick = win.gPages.rb3.onClick = function() {
-		if (win.gPages.rb3.value == true) {
-			win.gPages.et1.enabled = win.gPages.et2.enabled = true;
-			win.gPages.st1.visible = win.gPages.st2.visible = true;
-			win.gPages.et1.visible = win.gPages.et2.visible = true;
-		} else {
-			win.gPages.et1.enabled = win.gPages.et2.enabled = false;
-			win.gPages.st1.visible = win.gPages.st2.visible = false;
-			win.gPages.et1.visible = win.gPages.et2.visible = false;
+		win.gPages.rb1 = win.gPages.add("radiobutton", undefined, "First page only");
+		win.gPages.rb2 = win.gPages.add("radiobutton", undefined, "All pages");
+		win.gPages.rb3 = win.gPages.add("radiobutton", undefined, "Range");
+		win.gPages.rb2.value = true;
+		win.gPages.st1 = win.gPages.add("statictext", undefined, "From:");
+		win.gPages.et1 = win.gPages.add('edittext {properties: {name: "et1"}}');
+		win.gPages.et1.preferredSize.width = 40;
+		win.gPages.st2 = win.gPages.add("statictext", undefined, "To:");
+		win.gPages.et2 = win.gPages.add('edittext {properties: {name: "et2"}}');
+		win.gPages.et2.preferredSize.width = 40;
+		win.gPages.rb1.onClick = win.gPages.rb2.onClick = win.gPages.rb3.onClick = function() {
+			if (win.gPages.rb3.value == true) {
+				win.gPages.et1.enabled = win.gPages.et1.active = win.gPages.et2.enabled = true;
+				win.gPages.st1.visible = win.gPages.st2.visible = true;
+				win.gPages.et1.visible = win.gPages.et2.visible = true;
+			} else {
+				win.gPages.et1.enabled = win.gPages.et2.enabled = false;
+				win.gPages.st1.visible = win.gPages.st2.visible = false;
+				win.gPages.et1.visible = win.gPages.et2.visible = false;
+			}
 		}
-	}
-	win.gPages.et1.onChanging = function() {
-		if (this.text.match(/[^\-\.\d]/)) this.text = this.text.replace(/[^\-\.\d]/g, '');
-	}
-	win.gPages.et2.onChanging = function() {
-		if (this.text.match(/[^\-\.\d]/)) this.text = this.text.replace(/[^\-\.\d]/g, '');
-	}
-	win.gPages.rb3.onClick();
-
+		win.gPages.et1.onChanging = function() {
+			if (this.text.match(/[^\-\.\d]/)) this.text = this.text.replace(/[^\-\.\d]/g, '');
+		}
+		win.gPages.et2.onChanging = function() {
+			if (this.text.match(/[^\-\.\d]/)) this.text = this.text.replace(/[^\-\.\d]/g, '');
+		}
+		win.gPages.rb3.onClick();
 	// Panel 3: Source & destination
 	win.gIO = win.main.add("panel", undefined, "Source & destination");
 	win.gIO.orientation = "column";
 	win.gIO.alignChildren = "left";
-
-	win.gIO.g1 = win.gIO.add("group", undefined);
-	win.gIO.g1.orientation = "row";
-	win.gIO.g1.rb1 = win.gIO.g1.add("radiobutton", undefined, "Single file");
-	win.gIO.g1.rb2 = win.gIO.g1.add("radiobutton", undefined, "Folder");
-	win.gIO.g1.rb3 = win.gIO.g1.add("radiobutton", undefined, "Folder and subfolders");
-
-	win.gIO.g2 = win.gIO.add("group", undefined);
-	win.gIO.g2.orientation = "row";
-	win.gIO.g2.st1 = win.gIO.g2.add("statictext", undefined, "Source:");
-	win.gIO.g2.st1.preferredSize.width = 90;
-	win.gIO.g2.et1 = win.gIO.g2.add("edittext");
-	win.gIO.g2.et1.preferredSize.width = 312;
-	win.gIO.g2.bu1 = win.gIO.g2.add("button", undefined, "Browse");
-	var topLevelFolder = '';
-	win.gIO.g2.bu1.onClick = function() {
-		if (win.gIO.g1.rb1.value == true) {
-			topLevelFolder = File.openDialog('Please select PDF file', 'PDF File:*.pdf');
-		} else {
-			topLevelFolder = Folder.selectDialog('Please select the source folder');
-		}
-		if (topLevelFolder != null) win.gIO.g2.et1.text = decodeURI(topLevelFolder.fsName);
-	}
-	win.gIO.g1.rb1.onClick =
-	win.gIO.g1.rb2.onClick =
-	win.gIO.g1.rb3.onClick = function() {
-		if (win.gIO.g1.rb1.value == true) {
-			if (topLevelFolder instanceof Folder) { topLevelFolder = ''; win.gIO.g2.et1.text = '' }
-		} else {
-			if (topLevelFolder instanceof File) { topLevelFolder = ''; win.gIO.g2.et1.text = '' }
-		}
-	}
-	win.gIO.g1.rb2.value = true;
-	win.gIO.g1.rb2.onClick();
-
-	win.gIO.g3 = win.gIO.add("group", undefined);
-	win.gIO.g3.orientation = "row";
-	win.gIO.g3.st1 = win.gIO.g3.add("statictext", undefined, "Destination:");
-	win.gIO.g3.st1.preferredSize.width = 90;
-	win.gIO.g3.et1 = win.gIO.g3.add('edittext {properties: {name: "et1"}}');
-	win.gIO.g3.et1.preferredSize.width = 312;
-	win.gIO.g3.bu1 = win.gIO.g3.add("button", undefined, "Browse");
-	win.gIO.g3.bu1.onClick = function() {
-		outputFolder = Folder.selectDialog('Please select the output folder');
-		if (outputFolder != null) win.gIO.g3.et1.text = decodeURI(outputFolder.fsName);
-	}
-
-	win.gIO.g4 = win.gIO.add("group", undefined);
-	win.gIO.g4.orientation = "row";
-	win.gIO.g4.cb1 = win.gIO.g4.add("checkbox", undefined, "Save to original folder");
-	win.gIO.g4.cb1.onClick = function() {
-		if (win.gIO.g4.cb1.value) {
-			win.gIO.g3.et1.enabled = false;
-			win.gIO.g3.bu1.enabled = false;
-		} else {
-			win.gIO.g3.et1.enabled = true;
-			win.gIO.g3.bu1.enabled = true;
-		}
-	}
-
+		win.gIO.g1 = win.gIO.add("group", undefined);
+		win.gIO.g1.orientation = "row";
+			win.gIO.g1.rb1 = win.gIO.g1.add("radiobutton", undefined, "Single file");
+			win.gIO.g1.rb2 = win.gIO.g1.add("radiobutton", undefined, "Folder");
+			win.gIO.g1.rb3 = win.gIO.g1.add("radiobutton", undefined, "Folder and subfolders");
+		win.gIO.g2 = win.gIO.add("group", undefined);
+		win.gIO.g2.orientation = "row";
+			win.gIO.g2.st1 = win.gIO.g2.add("statictext", undefined, "Source:");
+			win.gIO.g2.st1.preferredSize.width = 90;
+			win.gIO.g2.et1 = win.gIO.g2.add("edittext");
+			win.gIO.g2.et1.preferredSize.width = 312;
+			win.gIO.g2.bu1 = win.gIO.g2.add("button", undefined, "Browse");
+			var topLevelFolder = '';
+			win.gIO.g2.bu1.onClick = function() {
+				if (win.gIO.g1.rb1.value == true) {
+					topLevelFolder = File.openDialog('Select PDF file', 'PDF File:*.pdf');
+				} else {
+					topLevelFolder = Folder.selectDialog('Select the source folder');
+				}
+				if (topLevelFolder != null) win.gIO.g2.et1.text = decodeURI(topLevelFolder.fsName);
+			}
+			win.gIO.g1.rb1.onClick =
+			win.gIO.g1.rb2.onClick =
+			win.gIO.g1.rb3.onClick = function() {
+				if (win.gIO.g1.rb1.value == true) {
+					if (topLevelFolder instanceof Folder) { topLevelFolder = ''; win.gIO.g2.et1.text = '' }
+				} else {
+					if (topLevelFolder instanceof File) { topLevelFolder = ''; win.gIO.g2.et1.text = '' }
+				}
+			}
+			win.gIO.g1.rb2.value = true;
+			win.gIO.g1.rb2.onClick();
+		win.gIO.g3 = win.gIO.add("group", undefined);
+		win.gIO.g3.orientation = "row";
+			win.gIO.g3.st1 = win.gIO.g3.add("statictext", undefined, "Destination:");
+			win.gIO.g3.st1.preferredSize.width = 90;
+			win.gIO.g3.et1 = win.gIO.g3.add('edittext {properties: {name: "et1"}}');
+			win.gIO.g3.et1.preferredSize.width = 312;
+			win.gIO.g3.bu1 = win.gIO.g3.add("button", undefined, "Browse");
+			win.gIO.g3.bu1.onClick = function() {
+				outputFolder = Folder.selectDialog('Select the output folder');
+				if (outputFolder != null) win.gIO.g3.et1.text = decodeURI(outputFolder.fsName);
+			}
+		win.gIO.g4 = win.gIO.add("group", undefined);
+		win.gIO.g4.orientation = "row";
+			win.gIO.g4.cb1 = win.gIO.g4.add("checkbox", undefined, "Save to original folder");
+			win.gIO.g4.cb1.value = true;
+			win.gIO.g4.cb1.onClick = function() {
+				if (win.gIO.g4.cb1.value) {
+					win.gIO.g3.et1.enabled = false;
+					win.gIO.g3.bu1.enabled = false;
+				} else {
+					win.gIO.g3.et1.enabled = true;
+					win.gIO.g3.bu1.enabled = true;
+				}
+			}
+			win.gIO.g4.cb1.onClick();
 	// Panel 4: Processing
 	win.gProc = win.main.add("panel", undefined, "Processing");
 	win.gProc.orientation = "column";
 	win.gProc.alignChildren = "left";
-
-	win.gProc.g1 = win.gProc.add("group", undefined);
-	win.gProc.g1.orientation = "row";
-	win.gProc.g1.cb1 = win.gProc.g1.add("checkbox", undefined, "Run action:");
-	win.gProc.g1.cb1.preferredSize.width = 90;
-	win.gProc.g1.dd1 = win.gProc.g1.add("dropdownlist", undefined, undefined);
-	win.gProc.g1.dd2 = win.gProc.g1.add("dropdownlist", undefined, undefined);
-	var actionSets = getActionSets();
-	for (var i in actionSets) win.gProc.g1.dd1.add('item', actionSets[i]);
-	win.gProc.g1.dd1.selection = 0;
-	var actions = getActions(actionSets[0]);
-	for (var i in actions) win.gProc.g1.dd2.add('item', actions[i]);
-	win.gProc.g1.dd2.selection = 0;
-	win.gProc.g1.dd1.onChange = function() {
-		win.gProc.g1.dd2.removeAll();
-		actions = getActions(actionSets[this.selection.index]);
-		for (var i in actions) win.gProc.g1.dd2.add('item', actions[i]);
-		win.gProc.g1.dd2.selection = 0;
-	}
-	win.gProc.g1.cb1.onClick = function() {
-		if (win.gProc.g1.cb1.value) {
-			win.gProc.g1.dd1.enabled = win.gProc.g1.dd2.enabled = true;
-		} else {
-			win.gProc.g1.dd1.enabled = win.gProc.g1.dd2.enabled = false;
-		}
-	}
-	win.gProc.g1.cb1.onClick();
-
-	win.gProc.g2 = win.gProc.add("group", undefined);
-	win.gProc.g2.orientation = "row";
-	win.gProc.g2.cb1 = win.gProc.g2.add("checkbox", undefined, "Resize to fit");
-	win.gProc.g2.cb1.preferredSize.width = 90;
-	win.gProc.g2.st1 = win.gProc.g2.add("statictext", undefined, "Width:");
-	win.gProc.g2.et1 = win.gProc.g2.add("edittext");
-	win.gProc.g2.et1.preferredSize.width = 50;
-	win.gProc.g2.st2 = win.gProc.g2.add("statictext", undefined, "px");
-	win.gProc.g2.st3 = win.gProc.g2.add("statictext", undefined, "Height:");
-	win.gProc.g2.et2 = win.gProc.g2.add("edittext");
-	win.gProc.g2.et2.preferredSize.width = 50;
-	win.gProc.g2.st4 = win.gProc.g2.add("statictext", undefined, "px");
-	win.gProc.g2.dd1 = win.gProc.g2.add("dropdownlist", undefined, undefined, 
-		{items: ["Before action", "After action"]});
-	win.gProc.g2.dd1.selection = 0;
-	win.gProc.g2.et1.onChanging = function() {
-		if (this.text.match(/[^\-\.\d]/)) this.text = this.text.replace(/[^\-\.\d]/g, '');
-	}
-	win.gProc.g2.et2.onChanging = function() {
-		if (this.text.match(/[^\-\.\d]/)) this.text = this.text.replace(/[^\-\.\d]/g, '');
-	}
-	win.gProc.g2.cb1.onClick = function() {
-		if (win.gProc.g2.cb1.value) {
-			win.gProc.g2.et1.enabled = win.gProc.g2.et1.active = true;
-			win.gProc.g2.et2.enabled = true;
-			win.gProc.g2.dd1.enabled = true;
-		} else {
-			win.gProc.g2.et1.enabled = win.gProc.g2.et2.enabled = false;
-			win.gProc.g2.dd1.enabled = false;
-		}
-	}
-	win.gProc.g2.cb1.onClick();
-
+		win.gProc.g1 = win.gProc.add("group", undefined);
+		win.gProc.g1.orientation = "row";
+			win.gProc.g1.cb1 = win.gProc.g1.add("checkbox", undefined, "Run action:");
+			win.gProc.g1.cb1.preferredSize.width = 90;
+			win.gProc.g1.dd1 = win.gProc.g1.add("dropdownlist", undefined, undefined);
+			win.gProc.g1.dd2 = win.gProc.g1.add("dropdownlist", undefined, undefined);
+			var actionSets = getActionSets();
+			for (var i in actionSets) win.gProc.g1.dd1.add('item', actionSets[i]);
+			win.gProc.g1.dd1.selection = 0;
+			var actions = getActions(actionSets[0]);
+			for (var i in actions) win.gProc.g1.dd2.add('item', actions[i]);
+			win.gProc.g1.dd2.selection = 0;
+			win.gProc.g1.dd1.onChange = function() {
+				win.gProc.g1.dd2.removeAll();
+				actions = getActions(actionSets[this.selection.index]);
+				for (var i in actions) win.gProc.g1.dd2.add('item', actions[i]);
+				win.gProc.g1.dd2.selection = 0;
+			}
+			win.gProc.g1.cb1.onClick = function() {
+				if (win.gProc.g1.cb1.value) {
+					win.gProc.g1.dd1.enabled = win.gProc.g1.dd2.enabled = true;
+				} else {
+					win.gProc.g1.dd1.enabled = win.gProc.g1.dd2.enabled = false;
+				}
+			}
+			win.gProc.g1.cb1.onClick();
+		win.gProc.g2 = win.gProc.add("group", undefined);
+		win.gProc.g2.orientation = "row";
+			win.gProc.g2.cb1 = win.gProc.g2.add("checkbox", undefined, "Resize to fit");
+			win.gProc.g2.cb1.preferredSize.width = 90;
+			win.gProc.g2.st1 = win.gProc.g2.add("statictext", undefined, "Width:");
+			win.gProc.g2.et1 = win.gProc.g2.add("edittext");
+			win.gProc.g2.et1.preferredSize.width = 50;
+			win.gProc.g2.st2 = win.gProc.g2.add("statictext", undefined, "px");
+			win.gProc.g2.st3 = win.gProc.g2.add("statictext", undefined, "Height:");
+			win.gProc.g2.et2 = win.gProc.g2.add("edittext");
+			win.gProc.g2.et2.preferredSize.width = 50;
+			win.gProc.g2.st4 = win.gProc.g2.add("statictext", undefined, "px");
+			win.gProc.g2.dd1 = win.gProc.g2.add("dropdownlist", undefined, undefined, 
+				{items: ["Before action", "After action"]});
+			win.gProc.g2.dd1.selection = 0;
+			win.gProc.g2.et1.onChanging = function() {
+				if (this.text.match(/[^\-\.\d]/)) this.text = this.text.replace(/[^\-\.\d]/g, '');
+			}
+			win.gProc.g2.et2.onChanging = function() {
+				if (this.text.match(/[^\-\.\d]/)) this.text = this.text.replace(/[^\-\.\d]/g, '');
+			}
+			win.gProc.g2.cb1.onClick = function() {
+				if (win.gProc.g2.cb1.value) {
+					win.gProc.g2.et1.enabled = win.gProc.g2.et1.active = true;
+					win.gProc.g2.et2.enabled = true;
+					win.gProc.g2.dd1.enabled = true;
+				} else {
+					win.gProc.g2.et1.enabled = win.gProc.g2.et2.enabled = false;
+					win.gProc.g2.dd1.enabled = false;
+				}
+			}
+			win.gProc.g2.cb1.onClick();
 	// Panel 5: Output options
 	win.gSave = win.main.add("panel", undefined, "Output options");
 	win.gSave.orientation = "row";
 	win.gSave.alignChildren = ["left","center"];
 	win.gSave.spacing = 20;
-
-	win.gSave.c1 = win.gSave.add("group", undefined);
-	win.gSave.c1.orientation = "column";
-	win.gSave.c1.alignChildren = ["fill","center"];
-
-	win.gSave.c1.g1 = win.gSave.c1.add("group", undefined);
-	win.gSave.c1.g1.orientation = "row";
-	win.gSave.c1.g1.alignChildren = ["left","center"];
-	win.gSave.c1.g1.cb1 = win.gSave.c1.g1.add("checkbox", undefined, "JPG:");
-	win.gSave.c1.g1.cb1.value = true;
-	win.gSave.c1.g1.dd1 = win.gSave.c1.g1.add("dropdownlist", undefined, undefined, 
-		{items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]});
-	win.gSave.c1.g1.dd1.selection = 7;
-	win.gSave.c1.g1.dd1.enabled = false;
-
-	win.gSave.c1.g2 = win.gSave.c1.add("group", undefined);
-	win.gSave.c1.g2.orientation = "row";
-	win.gSave.c1.g2.alignChildren = ["left","center"];
-	win.gSave.c1.g2.cb1 = win.gSave.c1.g2.add("checkbox", undefined, "Save For Web JPG:");
-	win.gSave.c1.g2.dd1 = win.gSave.c1.g2.add("dropdownlist", undefined, undefined);
-	for (var a = 1; a < 101; a++) win.gSave.c1.g2.dd1.add('item', a);
-	win.gSave.c1.g2.dd1.selection = 79;
-	win.gSave.c1.g2.dd1.enabled = false;
-
-	win.gSave.c2 = win.gSave.add("group", undefined);
-	win.gSave.c2.orientation = "column";
-	win.gSave.c2.alignChildren = ["fill","center"];
-	win.gSave.c2.g1 = win.gSave.c2.add("group", undefined);
-	win.gSave.c2.g1.orientation = "row";
-	win.gSave.c2.g1.alignChildren = ["left","center"];
-	win.gSave.c2.g1.cb1 = win.gSave.c2.g1.add("checkbox", undefined, "TIFF:");
-	win.gSave.c2.g1.dd1 = win.gSave.c2.g1.add("dropdownlist", undefined, undefined, 
-		{items: ['LZW', 'ZIP', 'JPG', 'None']});
-	win.gSave.c2.g1.dd1.selection = 0;
-	win.gSave.c2.g1.dd1.enabled = false;
-
-	win.gSave.c2.g2 = win.gSave.c2.add("group", undefined);
-	win.gSave.c2.g2.orientation = "row";
-	win.gSave.c2.g2.alignChildren = ["left","center"];
-	win.gSave.c2.g2.cb1 = win.gSave.c2.g2.add("checkbox", undefined, "PNG:");
-	win.gSave.c2.g2.dd1 = win.gSave.c2.g2.add("dropdownlist", undefined, undefined);
-	for (var a = 0; a < 101; a++) win.gSave.c2.g2.dd1.add('item', a);
-	win.gSave.c2.g2.dd1.selection = 80;
-	win.gSave.c2.g2.dd1.enabled = false;
-
-	win.gSave.c3 = win.gSave.add("group", undefined);
-	win.gSave.c3.orientation = "column";
-	win.gSave.c3.alignChildren = ["fill","top"];
-	win.gSave.c3.spacing = 15;
-
-	win.gSave.c3.g1 = win.gSave.c3.add("group", undefined);
-	win.gSave.c3.g1.orientation = "column";
-	win.gSave.c3.g1.alignChildren = ["left","center"];
-	win.gSave.c3.g1.cb1 = win.gSave.c3.g1.add("checkbox", undefined, "PSD");
-
-	win.gSave.c3.g2 = win.gSave.c3.add("group", undefined);
-	win.gSave.c3.g2.orientation = "column";
-	win.gSave.c3.g2.alignChildren = ["left","center"];
-	win.gSave.c3.g2.cb1 = win.gSave.c3.g2.add("checkbox", undefined, "PDF");
-
-	win.gSave.c2.g1.cb1.onClick = win.gSave.c2.g2.cb1.onClick = function() {
-		if (win.gSave.c2.g1.cb1.value) {
-			win.gSave.c2.g1.dd1.enabled = true;
-		} else {
-			win.gSave.c2.g1.dd1.enabled = false;
-		}
-	}
-	win.gSave.c1.g1.cb1.onClick = function() {
-		if (win.gSave.c1.g1.cb1.value) {
-			win.gSave.c1.g1.dd1.enabled = true;
-			win.gSave.c1.g2.cb1.value = false;
-			win.gSave.c1.g2.dd1.enabled = false;
-		} else {
-			win.gSave.c1.g1.dd1.enabled = false;
-		}
-	}
-	win.gSave.c1.g2.cb1.onClick = function() {
-		if (win.gSave.c1.g2.cb1.value) {
-			win.gSave.c1.g1.cb1.value = false;
-			win.gSave.c2.g2.dd1.enabled = false;
-			win.gSave.c1.g2.dd1.enabled = true;
-		} else {
-			win.gSave.c1.g2.dd1.enabled = false;
-		}
-	}
-	win.gSave.c1.g1.cb1.onClick();
+		win.gSave.c1 = win.gSave.add("group", undefined);
+		win.gSave.c1.orientation = "column";
+		win.gSave.c1.alignChildren = ["fill","center"];
+			win.gSave.c1.g1 = win.gSave.c1.add("group", undefined);
+			win.gSave.c1.g1.orientation = "row";
+			win.gSave.c1.g1.alignChildren = ["left","center"];
+				win.gSave.c1.g1.cb1 = win.gSave.c1.g1.add("checkbox", undefined, "JPG:");
+				win.gSave.c1.g1.cb1.value = true;
+				win.gSave.c1.g1.dd1 = win.gSave.c1.g1.add("dropdownlist", undefined, undefined, 
+					{items: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]});
+				win.gSave.c1.g1.dd1.selection = 7;
+				win.gSave.c1.g1.dd1.enabled = false;
+			win.gSave.c1.g2 = win.gSave.c1.add("group", undefined);
+			win.gSave.c1.g2.orientation = "row";
+			win.gSave.c1.g2.alignChildren = ["left","center"];
+				win.gSave.c1.g2.cb1 = win.gSave.c1.g2.add("checkbox", undefined, "Save For Web JPG:");
+				win.gSave.c1.g2.dd1 = win.gSave.c1.g2.add("dropdownlist", undefined, undefined);
+				for (var a = 1; a < 101; a++) win.gSave.c1.g2.dd1.add('item', a);
+				win.gSave.c1.g2.dd1.selection = 79;
+				win.gSave.c1.g2.dd1.enabled = false;
+		win.gSave.c2 = win.gSave.add("group", undefined);
+		win.gSave.c2.orientation = "column";
+		win.gSave.c2.alignChildren = ["fill","center"];
+			win.gSave.c2.g1 = win.gSave.c2.add("group", undefined);
+			win.gSave.c2.g1.orientation = "row";
+			win.gSave.c2.g1.alignChildren = ["left","center"];
+				win.gSave.c2.g1.cb1 = win.gSave.c2.g1.add("checkbox", undefined, "TIFF:");
+				win.gSave.c2.g1.dd1 = win.gSave.c2.g1.add("dropdownlist", undefined, undefined, 
+					{items: ['LZW', 'ZIP', 'JPG', 'None']});
+				win.gSave.c2.g1.dd1.selection = 0;
+				win.gSave.c2.g1.dd1.enabled = false;
+			win.gSave.c2.g2 = win.gSave.c2.add("group", undefined);
+			win.gSave.c2.g2.orientation = "row";
+			win.gSave.c2.g2.alignChildren = ["left","center"];
+				win.gSave.c2.g2.cb1 = win.gSave.c2.g2.add("checkbox", undefined, "PNG:");
+				win.gSave.c2.g2.dd1 = win.gSave.c2.g2.add("dropdownlist", undefined, undefined);
+				for (var a = 0; a < 101; a++) win.gSave.c2.g2.dd1.add('item', a);
+				win.gSave.c2.g2.dd1.selection = 80;
+				win.gSave.c2.g2.dd1.enabled = false;
+		win.gSave.c3 = win.gSave.add("group", undefined);
+		win.gSave.c3.orientation = "column";
+		win.gSave.c3.alignChildren = ["fill","top"];
+		win.gSave.c3.spacing = 15;
+			win.gSave.c3.g1 = win.gSave.c3.add("group", undefined);
+			win.gSave.c3.g1.orientation = "column";
+			win.gSave.c3.g1.alignChildren = ["left","center"];
+				win.gSave.c3.g1.cb1 = win.gSave.c3.g1.add("checkbox", undefined, "PSD");
+			win.gSave.c3.g2 = win.gSave.c3.add("group", undefined);
+			win.gSave.c3.g2.orientation = "column";
+			win.gSave.c3.g2.alignChildren = ["left","center"];
+				win.gSave.c3.g2.cb1 = win.gSave.c3.g2.add("checkbox", undefined, "Photoshop PDF");
+				win.gSave.c1.g1.cb1.onClick = function() {
+					if (win.gSave.c1.g1.cb1.value) {
+						win.gSave.c1.g1.dd1.enabled = true;
+						win.gSave.c1.g2.cb1.value = false;
+						win.gSave.c1.g2.dd1.enabled = false;
+					} else {
+						win.gSave.c1.g1.dd1.enabled = false;
+					}
+				}
+				win.gSave.c1.g2.cb1.onClick = function() {
+					if (win.gSave.c1.g2.cb1.value) {
+						win.gSave.c1.g1.cb1.value = false;
+						win.gSave.c1.g1.dd1.enabled = false;
+						win.gSave.c1.g2.dd1.enabled = true;
+					} else {
+						win.gSave.c1.g2.dd1.enabled = false;
+					}
+				}
+				win.gSave.c1.g1.cb1.onClick();
+				win.gSave.c2.g1.cb1.onClick = function() {
+					if (win.gSave.c2.g1.cb1.value) {
+						win.gSave.c2.g1.dd1.enabled = true;
+					} else {
+						win.gSave.c2.g1.dd1.enabled = false;
+					}
+				}
+				win.gSave.c2.g2.cb1.onClick = function() {
+					if (win.gSave.c2.g2.cb1.value) {
+						win.gSave.c2.g2.dd1.enabled = true;
+					} else {
+						win.gSave.c2.g2.dd1.enabled = false;
+					}
+				}
 
 	// Ok/Cancel group
 	win.gOkCancel = win.add("group", undefined);
 	win.gOkCancel.orientation = "column";
 	win.gOkCancel.alignChildren = "fill";
-	win.gOkCancel.bu1 = win.gOkCancel.add("button", undefined, "Ok", {name: "ok"});
-	win.gOkCancel.bu2 = win.gOkCancel.add("button", undefined, "Cancel", {name: "cancel"});
+		win.gOkCancel.bu1 = win.gOkCancel.add("button", undefined, "Ok", {name: "ok"});
+		win.gOkCancel.bu2 = win.gOkCancel.add("button", undefined, "Cancel", {name: "cancel"});
 
 	// Process all PDFs
 	win.gOkCancel.bu1.onClick = function() {

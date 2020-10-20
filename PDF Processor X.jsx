@@ -6,7 +6,7 @@
 	https://web.archive.org/web/20150511194417/https://www.ps-scripts.com/bb/viewtopic.php?f=10&t=1882&sid=a87e6a1cbc6fec5b38abbfc402e624ac
 */
 
-#target photoshop
+// @target photoshop
 app.bringToFront();
 
 if (app.version.match(/\d+/) < 10) {
